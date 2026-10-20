@@ -19,7 +19,7 @@ Sprint 1–2 delivered a single-tenant measurement → allocation → explain pa
 4. **Fact pack + Claude brief** (`src/report/`, `scripts/04_csuite_brief.py`)
 5. **Streamlit dashboard** (`app/streamlit_app.py`) with bounds + offline/live insights
 
-Sprint 3 hardens that stack for enterprise use: control for non-media confounders, isolate clients, and anchor posteriors with real MMT experiments — without inventing a new allocator/UI MVP.
+Sprint 3 hardens that stack for enterprise use: control for non-media confounders, isolate clients, and anchor the national ROI prior with geo-experiment bounds — without inventing a new allocator/UI MVP.
 
 ## Workstreams
 
@@ -39,9 +39,9 @@ Sprint 3 hardens that stack for enterprise use: control for non-media confounder
 
 **Technical intent:** Partition raw/processed data, model artifacts, and reports by `client_id`; scripts take an explicit tenant flag; config maps currency, channels, and geography per client.
 
-**Today:** Single-tenant assumptions — flat `data/raw/`, `data/processed/`, `reports/`; no `config/clients.yaml`; CLIs do not require `--client_id`.
+**Today:** `config/clients.yaml` lists `pathc` and `wellness` (currency, channels, one region label). `--client_id` defaults to `pathc` on ETL, QA, the spike, the allocator, the brief, calibration, and Streamlit. `pathc` keeps `data/raw`, `data/processed`, and `reports`; models are `data/clients/pathc/models`. `wellness` is only `data/clients/wellness/` (`raw`, `processed`, `models`, `reports`). `src/data/tenants.py` raises `TenantError` when a path lands in another client. Industry separation is this filesystem wall, not a second model. Regions are labels.
 
-**Architecture “done” (likely):** `data/clients/{client_id}/…` (or equivalent) isolation; client config map; cross-tenant load tests fail closed. Detailed DoD lives with STORY-502 below.
+**Landed:** Client config, `--client_id`, and a fail-closed path check. Other clients stay under `data/clients/{client_id}/`. Detailed behavior is STORY-502 below.
 
 ### 3. MMT Calibration
 
@@ -49,9 +49,9 @@ Sprint 3 hardens that stack for enterprise use: control for non-media confounder
 
 **Technical intent:** Ingest structured experiment lift bounds and use them as informative priors / anchors in Meridian; emit a before/after calibration delta report.
 
-**Today:** Product goal is stated in `CLAUDE.md` / `AGENTS.md` (“bottom-up calibration”); no `src/models/calibration.py` yet. Open measurement risk: **GAP-201-RANK** (Meridian channel order vs Path-C, Spearman ≈ −0.6) — MMT priors may help close or reframe that gap, but Sprint 3 does not automatically close it without new evidence.
+**Today:** `src/models/calibration.py` reads that client's `raw/calibration/geo_experiment.json` and writes `reports/calibration_delta.json` (for `pathc`: `data/raw/calibration/geo_experiment.json` and `reports/calibration_delta.json`). National `roi` bounds become a log-normal `roi_m` prior. A `bogota` row is ignored. The calibration command does not sample a posterior. `scripts/02_model_spike.py --calibration` runs the gate before `sample_prior`: the central interval must sit inside the experiment bounds, and the scale must be tighter than the default prior. A miss prints the reason and exits 1. The spike does not build the model. Omitting `--calibration` keeps `PriorDistribution()`. The JSON is synthetic, not a live MMT feed and not Path-C ground truth. **GAP-201-RANK** stays open (Spearman ≈ −0.6).
 
-**Architecture “done” (likely):** Calibration module + Meridian config hooks + `reports/calibration_delta.json` (or successor path under tenant layout). Detailed DoD lives with STORY-503 below.
+**Landed:** Calibration module, delta report, and a spike gate that refuses a failing prior before sampling. No city model. Detailed behavior is STORY-503 below.
 
 ## Stories (from local sprint file)
 
@@ -64,13 +64,18 @@ Stories below are **not invented** — they come from the local Sprint 3 backlog
 
 ### STORY-502 — Multi-Tenant Data & Model Isolation Directory Structure (5 pts)
 
-- Secure isolation pattern (e.g. `data/clients/{client_id}/`) across industries.
-- **DoD (summary):** Per-client raw/processed/weights/reports partitions; `config/clients.yaml` for currency/channels/geo; scripts accept `--client_id`; security test that Client A cannot read Client B paths.
+- Done on this branch (`8a2eca3` through `8d52c32`). `config/clients.yaml` lists `pathc` and `wellness`. `--client_id` defaults to `pathc`.
+- `pathc` keeps `data/raw`, `data/processed`, and `reports`. Models are `data/clients/pathc/models`. `wellness` is only `data/clients/wellness/` with `raw`, `processed`, `models`, and `reports`.
+- `src/data/tenants.py` raises `TenantError` on a cross-client path. Tests: `tests/test_tenants.py`. Industry separation is this filesystem wall, not a second model. Regions are labels.
+- Original DoD asked for raw/processed/weights/reports. Landed names are raw, processed, models, and reports.
 
 ### STORY-503 — MMT Geo-Experiment Prior Calibration Module (8 pts)
 
-- Calibration script (`src/models/calibration.py`) ingests live MMT geo-experiment results as informative Bayesian priors.
-- **DoD (summary):** Reads structured lift JSON (region×channel bounds); Meridian config anchors posteriors; pre/post report (e.g. `reports/calibration_delta.json`); regional drift constrained by experiment outcomes.
+- Done on this branch (`58434b4` through `fc8a8bb`). `python -m src.models.calibration` writes `reports/calibration_delta.json` from that client's geo-experiment JSON.
+- National `roi` bounds become a log-normal `roi_m` prior. A `bogota` row does not move it. The command does not sample a posterior.
+- The spike gate: `scripts/02_model_spike.py --calibration` calls `build_report` before `sample_prior`. A calibrated channel fails when its central interval misses the experiment bounds or its scale is not tighter than the default prior. The process exits 1 and does not build Meridian. Omitting `--calibration` keeps `PriorDistribution()`.
+- The checked-in JSON is synthetic. It is not a live MMT feed and not Path-C ground truth. There is no city model. `GAP-201-RANK` stays open.
+- Original DoD asked for live experiment results and regional drift constrained by those outcomes. That part is not in this code.
 
 ## Open gaps Sprint 3 may or may not touch
 

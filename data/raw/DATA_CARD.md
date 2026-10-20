@@ -77,7 +77,7 @@ Default client is `pathc`. These Path-C files stay in `data/raw` and `data/proce
 
 ## STORY-503 geo-experiment prior
 
-`data/raw/calibration/geo_experiment.json` holds synthetic national ROI bounds for `meta` and `google`, plus one `bogota` row that the national prior ignores. These numbers are not Path-C ground truth. `python -m src.models.calibration` writes `reports/calibration_delta.json` and does not sample a posterior. `GAP-201-RANK` stays open.
+`data/raw/calibration/geo_experiment.json` holds synthetic national ROI bounds for `meta` and `google`, plus one `bogota` row that the national prior ignores. These numbers are not Path-C ground truth. `python -m src.models.calibration` writes `reports/calibration_delta.json` and does not sample a posterior. `scripts/02_model_spike.py --calibration` exits 1 before `sample_prior` when a calibrated channel misses the experiment interval or does not tighten scale. Omitting `--calibration` keeps `PriorDistribution()`. `GAP-201-RANK` stays open.
 
 ## STORY-104 media QA (post-ETL)
 

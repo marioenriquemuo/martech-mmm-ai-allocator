@@ -1,0 +1,239 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "MMT project",
+    "locale": "en",
+    "output": ".archify/architecture-mmt-sprint3-20261020-215729/architecture-mmt-sprint3.html",
+    "quality_profile": "showcase",
+    "repository": {
+      "url": "https://origin.cursor.com/mario-mu-oz-dev/MMT-MMM.git",
+      "revision": "fc8a8bb011d4441d886e81d642f0bff411e531aa",
+      "link_mode": "local-only"
+    }
+  },
+  "components": [
+    {
+      "id": "panel",
+      "type": "database",
+      "label": "Path-C panel",
+      "sublabel": "synthetic channel-day CSV",
+      "pos": [16, 28],
+      "size": [140, 70],
+      "sources": [
+        { "path": "src/data/generator.py", "line": 239, "end_line": 242, "label": "generate dates" }
+      ]
+    },
+    {
+      "id": "wall",
+      "type": "security",
+      "label": "Client wall",
+      "sublabel": "default pathc",
+      "pos": [240, 28],
+      "size": [148, 70],
+      "sources": [
+        { "path": "src/data/tenants.py", "line": 104, "end_line": 115, "label": "load_client" },
+        { "path": "src/data/tenants.py", "line": 121, "end_line": 131, "label": "reject other client" },
+        { "path": "config/clients.yaml", "line": 1, "end_line": 12, "label": "pathc and wellness" }
+      ]
+    },
+    {
+      "id": "etl",
+      "type": "backend",
+      "label": "ETL",
+      "sublabel": "python -m src.data.etl",
+      "pos": [490, 28],
+      "size": [160, 70],
+      "sources": [
+        { "path": "src/data/etl.py", "line": 133, "end_line": 149, "label": "run_etl spend panel" },
+        { "path": "src/data/etl.py", "line": 152, "end_line": 183, "label": "main writes both files" }
+      ]
+    },
+    {
+      "id": "qa",
+      "type": "backend",
+      "label": "Media QA",
+      "sublabel": "hard-fail gate",
+      "pos": [991, 28],
+      "size": [148, 70],
+      "sources": [
+        { "path": "src/data/qa.py", "line": 311, "end_line": 335, "label": "run_qa overwrite" }
+      ]
+    },
+    {
+      "id": "controls",
+      "type": "database",
+      "label": "Exogenous controls",
+      "sublabel": "one row per date",
+      "pos": [490, 246],
+      "size": [160, 76],
+      "sources": [
+        { "path": "src/data/controls.py", "line": 125, "end_line": 156, "label": "build_controls" },
+        { "path": "src/data/controls.py", "line": 162, "end_line": 170, "label": "write_controls" }
+      ]
+    },
+    {
+      "id": "meridian",
+      "type": "backend",
+      "label": "Meridian",
+      "sublabel": "spend panel only",
+      "tag": "controls not in the fit",
+      "pos": [980, 246],
+      "size": [170, 78],
+      "sources": [
+        { "path": "src/models/meridian_data.py", "line": 1, "end_line": 11, "label": "clean_spend only" },
+        { "path": "src/models/meridian_data.py", "line": 124, "end_line": 132, "label": "weekly InputData" },
+        { "path": "scripts/02_model_spike.py", "line": 166, "end_line": 180, "label": "default prior if no flag" }
+      ]
+    },
+    {
+      "id": "gate",
+      "type": "security",
+      "label": "Calibration gate",
+      "sublabel": "optional --calibration",
+      "pos": [700, 246],
+      "size": [160, 76],
+      "sources": [
+        { "path": "src/models/calibration.py", "line": 174, "end_line": 218, "label": "build_report" },
+        { "path": "src/models/calibration.py", "line": 221, "end_line": 232, "label": "gate_reasons" },
+        { "path": "scripts/02_model_spike.py", "line": 457, "end_line": 477, "label": "gate before sample" }
+      ]
+    },
+    {
+      "id": "refuse",
+      "type": "backend",
+      "label": "No sample",
+      "sublabel": "exit 1",
+      "pos": [705, 412],
+      "size": [150, 68],
+      "sources": [
+        { "path": "scripts/02_model_spike.py", "line": 468, "end_line": 471, "label": "return 1 before model" }
+      ]
+    },
+    {
+      "id": "curves",
+      "type": "backend",
+      "label": "Response curves",
+      "sublabel": "metrics or fixture",
+      "pos": [980, 454],
+      "size": [170, 74],
+      "sources": [
+        { "path": "src/optimize/curves.py", "line": 113, "end_line": 120, "label": "curve provider" }
+      ]
+    },
+    {
+      "id": "allocator",
+      "type": "backend",
+      "label": "SLSQP allocator",
+      "sublabel": "bounds and budget",
+      "pos": [980, 638],
+      "size": [170, 72],
+      "sources": [
+        { "path": "src/optimize/allocator.py", "line": 30, "end_line": 40, "label": "optimize_budget" }
+      ]
+    },
+    {
+      "id": "facts",
+      "type": "backend",
+      "label": "Fact pack",
+      "sublabel": "number lock",
+      "pos": [980, 810],
+      "size": [170, 72],
+      "sources": [
+        { "path": "src/report/facts.py", "line": 30, "end_line": 40, "label": "build_fact_pack" },
+        { "path": "src/report/facts.py", "line": 97, "end_line": 106, "label": "numbers_match" },
+        { "path": "src/report/brief.py", "line": 102, "end_line": 104, "label": "lock before text" }
+      ]
+    },
+    {
+      "id": "brief",
+      "type": "backend",
+      "label": "C-suite brief",
+      "sublabel": "offline or Claude",
+      "pos": [704, 810],
+      "size": [180, 72],
+      "sources": [
+        { "path": "src/report/brief.py", "line": 64, "end_line": 70, "label": "render_offline" },
+        { "path": "src/report/brief.py", "line": 223, "end_line": 232, "label": "render_live" },
+        { "path": "scripts/04_csuite_brief.py", "line": 76, "end_line": 101, "label": "CLI chooses path" }
+      ]
+    },
+    {
+      "id": "dashboard",
+      "type": "frontend",
+      "label": "Streamlit dashboard",
+      "sublabel": "Update insights calls Claude",
+      "pos": [970, 982],
+      "size": [190, 78],
+      "sources": [
+        { "path": "src/dashboard/view.py", "line": 127, "end_line": 139, "label": "build_dashboard" },
+        { "path": "app/streamlit_app.py", "line": 173, "end_line": 177, "label": "client_id default pathc" },
+        { "path": "app/streamlit_app.py", "line": 330, "end_line": 330, "label": "Update insights" }
+      ]
+    }
+  ],
+  "connections": [
+    { "id": "panel-to-wall", "from": "panel", "to": "wall", "label": "client id", "variant": "emphasis" },
+    { "id": "wall-to-etl", "from": "wall", "to": "etl", "label": "client files" },
+    { "id": "etl-to-qa", "from": "etl", "to": "qa", "label": "spend panel" },
+    { "id": "etl-to-controls", "from": "etl", "to": "controls", "label": "date-level parquet" },
+    { "id": "qa-to-meridian", "from": "qa", "to": "meridian", "label": "clean spend" },
+    { "id": "gate-to-meridian", "from": "gate", "to": "meridian", "label": "pass: roi prior", "variant": "security" },
+    { "id": "gate-to-refuse", "from": "gate", "to": "refuse", "label": "exit 1", "variant": "dashed" },
+    { "id": "meridian-to-curves", "from": "meridian", "to": "curves", "label": "response curves" },
+    { "id": "curves-to-allocator", "from": "curves", "to": "allocator", "label": "curve knots" },
+    { "id": "allocator-to-facts", "from": "allocator", "to": "facts", "label": "allocation" },
+    { "id": "facts-to-brief", "from": "facts", "to": "brief", "label": "number lock" },
+    { "id": "facts-to-dashboard", "from": "facts", "to": "dashboard", "label": "same plan" }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Client wall",
+      "items": [
+        "Default client is pathc. No flag still uses today's files.",
+        "pathc keeps data/raw, data/processed, and reports.",
+        "wellness uses only data/clients/wellness/.",
+        "Industry separation is this wall, not a second model."
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "Date-level controls",
+      "items": [
+        "One row per date. Do not sum across channels.",
+        "Quincena is day 15 or the last calendar day.",
+        "CSV or in-memory frames, not a live API.",
+        "Brand search can be a mediator. Inventory can be a result of demand."
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "Not in the fit",
+      "items": [
+        "Meridian reads the post-QA spend panel only.",
+        "GAP-501-MODEL and GAP-501-API stay open.",
+        "GAP-201-RANK stays open."
+      ]
+    },
+    {
+      "dot": "orange",
+      "title": "Calibration gate",
+      "items": [
+        "Runs only when the spike is given --calibration.",
+        "Pass: national roi bounds become log-normal roi_m.",
+        "Fail: exit 1 before sample_prior. No model is built.",
+        "A bogota row does not move the national prior.",
+        "Omit the flag to keep PriorDistribution()."
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "What the numbers are",
+      "items": [
+        "Incremental KPI, not revenue dollars.",
+        "baseline_sales stays on the spend panel."
+      ]
+    }
+  ]
+}

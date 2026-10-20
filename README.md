@@ -15,6 +15,9 @@ flowchart LR
   spend --> qa[Media QA]
   qa --> mmm[Meridian MMM]
   controls -.->|not in the fit| mmm
+  gate[Calibration gate]
+  gate -->|pass, optional flag| mmm
+  gate -->|fail| stop[Exit 1 before sample]
   mmm --> curves[Response curves]
   curves --> alloc[SLSQP allocator]
   alloc --> facts[Fact pack and number lock]
@@ -22,7 +25,7 @@ flowchart LR
   facts --> dash[Streamlit dashboard]
 ```
 
-Controls are not in the Meridian fit yet. Default client is `pathc`. Industry separation is this filesystem wall, not a second model. Full diagram: [`.archify/architecture-mmt-project/architecture-mmt-project.html`](.archify/architecture-mmt-project/architecture-mmt-project.html).
+Controls are not in the Meridian fit yet. Default client is `pathc`. Industry separation is this filesystem wall, not a second model. The calibration gate runs only when the spike is given `--calibration`. A failing gate exits 1 before `sample_prior`. Omitting the flag keeps `PriorDistribution()`. Full diagram: [`.archify/architecture-mmt-sprint3-20261020-215729/architecture-mmt-sprint3.html`](.archify/architecture-mmt-sprint3-20261020-215729/architecture-mmt-sprint3.html).
 
 ## 5-minute quickstart
 
@@ -332,6 +335,8 @@ streamlit run app/streamlit_app.py -- --client_id pathc
 ## STORY-503 / geo-experiment prior
 
 `python -m src.models.calibration` reads that client's `raw/calibration/geo_experiment.json` and writes `reports/calibration_delta.json`. For `pathc` those paths are `data/raw/calibration/geo_experiment.json` and `reports/calibration_delta.json`. National `roi` bounds become a log-normal `roi_m` prior. A `bogota` row does not move the national prior. Wellness has no experiment file, so its report leaves every channel on the default prior. The command does not sample a posterior. The fixture numbers are not Path-C ground truth, and `GAP-201-RANK` stays open.
+
+The spike gate runs only with `--calibration`. `build_report` must pass before `sample_prior`: each calibrated channel's central interval stays inside the experiment bounds, and its scale is tighter than the default prior. A miss prints the reason and exits 1. Meridian is not built. Omitting `--calibration` keeps `PriorDistribution()`.
 
 ```bash
 conda activate mmt-mmm

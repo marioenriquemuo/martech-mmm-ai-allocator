@@ -16,7 +16,7 @@ Index: [`README.md`](README.md).
 | Status | `open` |
 | Severity | High (measurement correctness vs Path-C ground truth) |
 | Description | Meridian posterior iROAS channel order disagrees with Path-C contribution / `media_beta` order. Speaks to whether posteriors (and downstream allocator curves) recover planted channel strength. |
-| Evidence | Deep dive: [`story-201-meridian.md`](story-201-meridian.md). Metrics at tip `188e496`: `reports/metrics.json` → `recovery_spearman: -0.6`, `dod.directional_recovery: false`. Also `reports/parameter_recovery.md`, README / CLAUDE / AGENTS / `data/raw/DATA_CARD.md` open-issue callouts. STORY-503 tightens the national `roi_m` prior from geo-experiment bounds and does not sample a posterior, so it does not close this gap. |
+| Evidence | Deep dive: [`story-201-meridian.md`](story-201-meridian.md). Metrics at tip `188e496`: `reports/metrics.json` → `recovery_spearman: -0.6`, `dod.directional_recovery: false`. Also `reports/parameter_recovery.md`, README / CLAUDE / AGENTS / `data/raw/DATA_CARD.md` open-issue callouts. STORY-503 tightens the national `roi_m` prior from geo-experiment bounds and does not sample a posterior. The spike refuses a failing calibration before `sample_prior`. Neither step refits channel rank, so this gap stays open. |
 | Done when | A later recovery/calibration story produces documented channel-rank agreement (or an explicit accepted definitional mismatch with updated DoD), and this gap is closed with a citation to the new evidence. |
 
 ---

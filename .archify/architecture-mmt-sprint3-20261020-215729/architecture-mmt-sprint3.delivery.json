@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "receiptId": "3bf0aee3-f1c5-4be3-adef-31469581672a",
+  "status": "current",
+  "command": "deliver",
+  "type": "architecture",
+  "input": "/workspace/.archify/architecture-mmt-sprint3-20261020-215729/candidate.json",
+  "output": "/workspace/.archify/architecture-mmt-sprint3-20261020-215729/architecture-mmt-sprint3.html",
+  "specification": {
+    "sha256": "d2061d9d99f936428c03381021c13911a9bfb49a454777a159f2739675da3704",
+    "bytes": 8686
+  },
+  "artifact": {
+    "sha256": "424ff7fd0e992c5c83948f105982fd30f90144be1b395a284633238cdbd1101b",
+    "bytes": 772220
+  }
+}

@@ -37,7 +37,7 @@ Not a trading lab. Do not import forex-research lab protocol, DSR gates, or Back
 | `src/data/etl.py` | STORY-103 spend panel; STORY-501 `main` also writes controls |
 | `src/data/controls.py` | STORY-501 date-level exogenous controls (CSV or frames) |
 | `src/data/tenants.py` | STORY-502 client filesystem wall (`--client_id`, default `pathc`) |
-| `src/models/calibration.py` | STORY-503 geo-experiment ROI prior (`roi_m` only; no posterior) |
+| `src/models/calibration.py` | STORY-503 geo-experiment ROI prior (`roi_m` only; no posterior). Spike `--calibration` exits 1 before sampling when the gate fails |
 | `src/data/qa.py` | STORY-104 media detect / repair / hard-fail gate |
 | `src/models/transformations.py` | STORY-102 geometric / Weibull adstock + Hill saturation |
 | `src/models/meridian_data.py` | STORY-201 clean parquet → Meridian national `InputData` |
@@ -64,7 +64,7 @@ Not a trading lab. Do not import forex-research lab protocol, DSR gates, or Back
 | `reports/figures/` | Plotly HTML + Meridian PPC + `story_301_*.html` + `story_302_*.html` |
 | `docs/graphify-archify.md` | Index of graphify + archify artifacts |
 | `graphify-out/` | Knowledge graph outputs |
-| `.archify/architecture-mmt-project/architecture-mmt-project.html` | Current project architecture diagram |
+| `.archify/architecture-mmt-sprint3-20261020-215729/architecture-mmt-sprint3.html` | Current project architecture diagram |
 | `.cursor/skills/` | Repo-only skills: `mmt-mmm`, `secret-hygiene`, `archify` |
 | `.cursor/rules/` | Repo-only rules: `graphify`, `secret-hygiene` |
 | `Secret/` | Local-only; **gitignored** — never commit |
@@ -83,7 +83,7 @@ Sprint 1 is complete on `main` (tag `sprint-1-milestone-1`); branch `sprint-1-co
 - **STORY-104 done** — media QA detect/repair + audit; overwrite parquet; hard-fail if unrepaired
 - **STORY-501 done (feature tip)** — `python -m src.data.etl` writes `clean_spend.parquet` (date × channel) and `exogenous_controls.parquet` (one row per date: organic, brand search, CRM, holiday, quincena, price drop, stockout). Do not sum controls across channels. `baseline_sales` stays on the spend panel. Quincena is day 15 or the last calendar day of the month. Brand search can be a mediator; inventory can be a result of demand. CSV or in-memory frames, not a live API. Controls are not in the Meridian fit. `GAP-201-RANK` stays open. New open items: `GAP-501-API`, `GAP-501-MODEL`.
 - **STORY-502 done (feature tip)** — Default client `pathc`. Four directories per client: raw, processed, models, reports. `pathc` keeps `data/raw`, `data/processed`, and `reports` (`models` at `data/clients/pathc/models`). `wellness` uses only `data/clients/wellness/`. `--client_id` defaults to `pathc`. Industry separation is this filesystem wall, not a second model. Regions are labels.
-- **STORY-503 done (feature tip)** — `python -m src.models.calibration` turns national geo-experiment ROI bounds into a log-normal `roi_m` prior and writes `reports/calibration_delta.json`. A `bogota` row is ignored. No posterior sample. `GAP-201-RANK` stays open. The spike takes optional `--calibration`; omitting it keeps `PriorDistribution()`.
+- **STORY-503 done (feature tip)** — `python -m src.models.calibration` turns national geo-experiment ROI bounds into a log-normal `roi_m` prior and writes `reports/calibration_delta.json`. A `bogota` row is ignored. No posterior sample. `GAP-201-RANK` stays open. `scripts/02_model_spike.py --calibration` runs that gate before `sample_prior`. A miss (interval outside the experiment, or scale not tighter than the default prior) exits 1 and does not build Meridian. Omitting `--calibration` keeps `PriorDistribution()`.
 - **STORY-201 spike done** — Meridian national weekly (`google-meridian`, adapter, `scripts/02_model_spike.py`, DoD artifacts under `reports/`); learnings in `docs/learnings/story-201-meridian.md` (**open:** rank recovery vs Path-C, Spearman ≈ −0.6)
 - **STORY-301 done (feature tip)** — offline response curves → SLSQP allocator (`src/optimize/`, `scripts/03_allocate_budget.py`); teaching figures under `reports/figures/story_301_*.html`; on solver failure `channels` is `{}` (no partial plan). **Caveat:** allocations follow Meridian/fixture curves, not Path-C ground truth.
 - **STORY-302 done (feature tip, step 0–4)** — teaching figures `scripts/plot_story_302_concepts.py` (`reports/figures/story_302_*.html`); fact pack, schema, and brief in `src/report/`; CLI `scripts/04_csuite_brief.py` (`--offline` or live, model `claude-sonnet-4-5`). Structured fields stay exact; headline and bullets may round a fact (lift 0.12). Key: `ANTHROPIC_API_KEY` or gitignored `Secret/anthropic_api_key` (never commit). **Caveat:** incremental KPI, not revenue; Meridian ≠ Path-C. Not merged.

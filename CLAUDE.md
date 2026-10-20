@@ -116,13 +116,13 @@ Allocator trusts Meridian (or fixture) response curves — same Meridian≠Path-
 | Working branch | `sprint-3-exogenous-multitenant-mmt` |
 | Goal | Upgrade the data ingestion pipeline to handle organic traffic, holidays, quincenas, and inventory gaps, establish multi-tenant client isolation, and integrate MMT geo-experiment calibration anchors. |
 | Brief | [`docs/sprints/sprint-3.md`](docs/sprints/sprint-3.md) |
-| Architecture | [`.archify/architecture-mmt-project/architecture-mmt-project.html`](.archify/architecture-mmt-project/architecture-mmt-project.html) |
+| Architecture | [`.archify/architecture-mmt-sprint3-20261020-215729/architecture-mmt-sprint3.html`](.archify/architecture-mmt-sprint3-20261020-215729/architecture-mmt-sprint3.html) |
 
 | Story | Status | Notes |
 | --- | --- | --- |
 | STORY-501 | Done (feature tip) | `python -m src.data.etl` writes `clean_spend.parquet` (date × channel) and `exogenous_controls.parquet` (one row per date). Quincena is day 15 or the last calendar day. CSV or in-memory frames, not a live API. Not in the Meridian fit. Open: `GAP-501-API`, `GAP-501-MODEL`. |
 | STORY-502 | Done (feature tip) | Default client `pathc` keeps today's raw/processed/reports. `wellness` is only `data/clients/wellness/`. Four dirs: raw, processed, models, reports. `--client_id` (default `pathc`). The wall is the separation, not a second model. |
-| STORY-503 | Done (feature tip) | National ROI prior from geo-experiment bounds (`src/models/calibration.py`). Does not refit Meridian. `GAP-201-RANK` stays open. |
+| STORY-503 | Done (feature tip) | National `roi_m` prior from geo-experiment bounds (`src/models/calibration.py`). Writes `reports/calibration_delta.json`. Does not sample a posterior. Spike `--calibration` exits 1 before `sample_prior` when the gate fails. Omit the flag to keep `PriorDistribution()`. `GAP-201-RANK` stays open. |
 
 Stories sourced from local sprint backlog under `Secret/` (gitignored). Open gaps that may overlap: `GAP-201-RANK` (see `docs/learnings/open-gaps.md`).
 

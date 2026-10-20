@@ -24,7 +24,7 @@ Do not invent gaps here. Add a row only when README, CLAUDE/AGENTS, a learning d
 
 ## Sprint 3 themes vs open gaps
 
-Working branch: `sprint-3-exogenous-multitenant-mmt`. Brief: [`docs/sprints/sprint-3.md`](../sprints/sprint-3.md) (STORY-501/502/503 from local sprint file). Gaps that may be touched by those themes (not auto-closed):
+Working branch: `sprint-3-exogenous-multitenant-mmt` (tip `fc8a8bb`). Brief: [`docs/sprints/sprint-3.md`](../sprints/sprint-3.md). STORY-501 writes date-level `exogenous_controls.parquet` (not passed into Meridian). STORY-502 is the client filesystem wall (`config/clients.yaml`, `--client_id`, default `pathc`). STORY-503 is the national `roi_m` prior; the spike `--calibration` gate exits 1 before sampling when it fails. Gaps that may be touched by those themes (not auto-closed):
 
 - `GAP-201-RANK` — calibration / recovery honesty (MMT anchors could inform a later fix; not assumed)
 - `GAP-COMM-KPI` — still applies to any new lift / calibration narrative
