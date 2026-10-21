@@ -49,6 +49,7 @@ class FactPack(BaseModel):
     concentration_note: str | None
     expected_incremental_kpi: float | None
     incremental_kpi_delta_vs_baseline: float | None
+    mode: str | None = None
 
 
 # --- Tool schema ---

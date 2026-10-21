@@ -21,6 +21,7 @@ Use [`open-gaps.md`](open-gaps.md) as the checklist. At tip `188e496` (pre-regis
 - [ ] `GAP-501-MODEL` — exogenous controls are aligned and not passed into Meridian
 - [ ] `GAP-504-SMOKE` — smoke can exit 0 without replacing the curve file the allocator and dashboard read
 - [ ] `GAP-505-RHAT` — a failed full fit must not replace the current `metrics.json`
+- [ ] `GAP-506-MODE` — offline brief must name target vs maximize
 
 Do not invent gaps here. Add a row only when README, CLAUDE/AGENTS, a learning doc, metrics, or a Bugbot review already evidences it.
 

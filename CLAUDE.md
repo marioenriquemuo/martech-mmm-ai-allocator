@@ -126,7 +126,7 @@ Allocator trusts Meridian (or fixture) response curves — same Meridian≠Path-
 
 Stories sourced from local sprint backlog under `Secret/` (gitignored). Open gaps that may overlap: `GAP-201-RANK` (see `docs/learnings/open-gaps.md`).
 
-STORY-504 and STORY-505 are not done. Brief: [`docs/sprints/sprint-4.md`](docs/sprints/sprint-4.md). They do not close `GAP-201-RANK` or `GAP-501-MODEL`.
+STORY-504 through STORY-506 are not done. Brief: [`docs/sprints/sprint-4.md`](docs/sprints/sprint-4.md). They do not close `GAP-201-RANK` or `GAP-501-MODEL`.
 
 ## Key conventions
 

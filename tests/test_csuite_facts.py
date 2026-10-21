@@ -54,6 +54,7 @@ def test_equal_room_baseline_and_alpha_ceiling():
     pack = build_fact_pack(allocation)
     FactPack.model_validate(pack)
 
+    assert pack["mode"] == allocation["constraints"]["mode"]
     assert pack["expected_incremental_kpi"] == allocation["expected_incremental_kpi"]
     assert (
         pack["incremental_kpi_delta_vs_baseline"]

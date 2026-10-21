@@ -2,7 +2,7 @@
 
 Reads an allocation plan (``optimize_budget`` / ``allocation.json``) and
 recomputes the equal-room baseline. Does not call a model and does not
-recompute KPI — those two fields are copied from the plan.
+recompute KPI — those two fields and ``constraints.mode`` are copied from the plan.
 """
 
 from __future__ import annotations
@@ -28,7 +28,7 @@ _NUMBER_TOKEN = re.compile(r"[+-]?(?:\d+\.\d+|\d+)%?")
 
 
 def build_fact_pack(allocation: Mapping[str, Any]) -> dict[str, Any]:
-    """Channel shifts, saturation flags, and copied KPI fields.
+    """Channel shifts, saturation flags, copied KPI fields, and ``constraints.mode``.
 
     Raises ``ValueError`` when ``solver.success`` is false or ``channels``
     is empty — callers get no partial pack.
@@ -59,6 +59,7 @@ def build_fact_pack(allocation: Mapping[str, Any]) -> dict[str, Any]:
 
     min_spend = constraints.get("min_spend", 0.0)
     max_spend = constraints.get("max_spend")
+    raw_mode = constraints.get("mode")
     if max_spend is None:
         raise ValueError("no fact pack: constraints.max_spend is required")
 
@@ -91,6 +92,7 @@ def build_fact_pack(allocation: Mapping[str, Any]) -> dict[str, Any]:
         "incremental_kpi_delta_vs_baseline": allocation.get(
             "incremental_kpi_delta_vs_baseline"
         ),
+        "mode": None if raw_mode is None else str(raw_mode),
     }
 
 

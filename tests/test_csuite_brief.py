@@ -77,6 +77,31 @@ def test_offline_brief_validates_and_locks_numbers():
     assert "revenue" not in prose.lower()
 
 
+def test_target_and_maximize_opening_lines_differ():
+    """Same plan, two modes: the opening line names the question."""
+    maximize = _allocation()
+    target = json.loads(json.dumps(maximize))
+    target["constraints"]["mode"] = "target"
+
+    max_pack = build_fact_pack(maximize)
+    tgt_pack = build_fact_pack(target)
+    assert max_pack["mode"] == "maximize"
+    assert tgt_pack["mode"] == "target"
+
+    max_brief = render_offline(max_pack)
+    tgt_brief = render_offline(tgt_pack)
+    assert max_brief.headline != tgt_brief.headline
+    assert max_brief.headline.startswith("How to split this fixed total budget.")
+    assert tgt_brief.headline.startswith("Cheapest spend that reaches the KPI target.")
+    assert "Move alpha up" in max_brief.headline
+    assert "Move alpha up" in tgt_brief.headline
+    assert numbers_match(max_pack, max_brief)
+    assert numbers_match(tgt_pack, tgt_brief)
+    assert max_brief.model_dump(exclude={"headline"}) == tgt_brief.model_dump(
+        exclude={"headline"}
+    )
+
+
 def test_null_delta_does_not_invent_lift():
     allocation = _allocation()
     allocation["incremental_kpi_delta_vs_baseline"] = None
