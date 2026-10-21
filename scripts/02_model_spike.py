@@ -10,9 +10,10 @@ Examples::
     python scripts/02_model_spike.py --mode smoke --calibration data/raw/calibration/geo_experiment.json
     python scripts/02_model_spike.py --mode full
 
-Fuller mode writes metrics, the posterior predictive plot, and the
-parameter-recovery note under that client's ``models/``. Exits non-zero if max R-hat on core
-params ≥ 1.05. Smoke mode prints ``SMOKE_RHAT_WARN`` when R-hat is high but
+Fuller mode writes the posterior predictive plot and the parameter-recovery
+note under that client's ``models/``. It writes ``metrics.json`` only when
+max core R-hat is under 1.05. A miss exits 1 and leaves that curve file
+untouched. Smoke mode prints ``SMOKE_RHAT_WARN`` when R-hat is high but
 still exits 0 unless ``--fail-on-rhat``. Smoke does not write ``metrics.json``.
 It prints ``existing metrics: <path>`` when that file is already there, or
 ``no curve file yet: <path>`` when it is not, then ``curves were not replaced``.
@@ -434,6 +435,38 @@ def smoke_curves_notice(metrics_path: Path) -> str:
     return f"{head}\ncurves were not replaced"
 
 
+# --- Curve file gate (STORY-505) ---
+
+
+def publish_full_metrics(
+    metrics_path: Path,
+    metrics: dict,
+    *,
+    rhat_pass: bool,
+    max_rhat_core: float,
+    threshold: float,
+) -> int:
+    """Write ``metrics.json`` only when core R-hat passes.
+
+    The allocator and the dashboard treat this file as the current curves
+    and do not read ``dod.rhat_lt_1_05``. A failed full fit leaves an
+    existing file byte-for-byte and does not create a missing one.
+    Returns 0 after a write, or 1 when the curve file was not replaced.
+    """
+    if not rhat_pass:
+        print(f"curve file not replaced: {metrics_path}", file=sys.stderr)
+        print(
+            f"FAIL: max core R-hat {max_rhat_core:.4f} "
+            f">= {threshold}",
+            file=sys.stderr,
+        )
+        return 1
+    metrics_path.write_text(json.dumps(_jsonable(metrics), indent=2) + "\n")
+    print(f"wrote {metrics_path}")
+    print("full DoD: R-hat PASS (recovery status recorded; not a hard fail)")
+    return 0
+
+
 def main() -> int:
     args = _parse_args()
     client = load_client(args.client_id)
@@ -563,18 +596,14 @@ def main() -> int:
             "directional_recovery": recovery_stats["directional_recovery"],
         },
     }
-    metrics_path.write_text(json.dumps(_jsonable(metrics), indent=2) + "\n")
-    print(f"wrote {metrics_path}")
-
-    if not rhat_info["rhat_pass"]:
-        print(
-            f"FAIL: max core R-hat {rhat_info['max_rhat_core']:.4f} "
-            f">= {args.rhat_threshold}",
-            file=sys.stderr,
-        )
-        return 1
-    print("full DoD: R-hat PASS (recovery status recorded; not a hard fail)")
-    return 0
+    # metrics.json is the current curves. Write it only when R-hat passes.
+    return publish_full_metrics(
+        metrics_path,
+        metrics,
+        rhat_pass=bool(rhat_info["rhat_pass"]),
+        max_rhat_core=float(rhat_info["max_rhat_core"]),
+        threshold=float(args.rhat_threshold),
+    )
 
 
 if __name__ == "__main__":

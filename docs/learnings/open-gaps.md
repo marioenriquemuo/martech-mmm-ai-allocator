@@ -125,6 +125,19 @@ Index: [`README.md`](README.md).
 
 ---
 
+## GAP-505-RHAT
+
+| Field | Value |
+| --- | --- |
+| Story | STORY-505 |
+| Status | `open` |
+| Severity | High (a failed fit must not become the current curves) |
+| Description | On `--mode full`, a core R-hat at or above 1.05 must not replace `models/metrics.json`. The allocator and the dashboard read that file and never check `dod.rhat_lt_1_05`, so a failed fit that lands there becomes the current model. |
+| Evidence | `scripts/02_model_spike.py` `publish_full_metrics` is the write gate. Default curves for the allocator: `data/clients/pathc/models/metrics.json` (`scripts/03_allocate_budget.py`). Readers that do not check the flag: `src/optimize/curves.py` `MetricsJsonCurveProvider`, `src/dashboard/view.py`, `app/streamlit_app.py`. Smoke mode returns before the write. |
+| Done when | A failed full fit leaves an existing `metrics.json` byte-for-byte and does not create it when missing. `tests/test_model_spike_helpers.py` locks that without MCMC. Closing this row does not close `GAP-201-RANK` or `GAP-501-MODEL`.
+
+---
+
 ## Closed / not listed
 
 - `GAP-402-RENAME` — closed 2026-10-14; GitHub is `marioenriquemuo/martech-mmm-ai-allocator` (public). Local `github` remote updated. Origin unchanged.
