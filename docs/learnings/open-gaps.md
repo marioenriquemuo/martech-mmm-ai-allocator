@@ -112,6 +112,19 @@ Index: [`README.md`](README.md).
 
 ---
 
+## GAP-506-MODE
+
+| Field | Value |
+| --- | --- |
+| Story | STORY-506 |
+| Status | `open` |
+| Severity | Medium (two questions, one sentence shape) |
+| Description | Target mode (cheapest spend that reaches a KPI) and maximize mode (split a fixed total budget) shared one opening shape, `Move {channel} up…`. Readers treated the two answers as one recommendation. `constraints.mode` is `target` or `maximize` on the allocation. |
+| Evidence | Walkthrough: target, KPI 1000, total about $509, all on meta, headline started `Move meta up`. Dashboard maximize, total about $17.3M, headline started `Move tv up`. Mode is stored in `src/optimize/allocator.py` (`constraints.mode`). `src/report/facts.py` copies it. `src/report/brief.py` `render_offline` uses it on the opening line. This row stays `open`. |
+| Done when | The offline opening line names the question, a test shows a target brief and a maximize brief do not share that line, and this row is set to `closed`. |
+
+---
+
 ## Closed / not listed
 
 - `GAP-402-RENAME` — closed 2026-10-14; GitHub is `marioenriquemuo/martech-mmm-ai-allocator` (public). Local `github` remote updated. Origin unchanged.

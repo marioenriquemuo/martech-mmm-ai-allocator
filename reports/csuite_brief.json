@@ -1,5 +1,5 @@
 {
-  "headline": "Move alpha up: 27 vs baseline 20.",
+  "headline": "How to split this fixed total budget. Move alpha up: 27 vs baseline 20.",
   "bullets": [
     "Budget shift: alpha 20 → 27 (+7); beta 20 → 18 (-2); gamma 20 → 15 (-5).",
     "Saturation: alpha near_ceiling, beta ok, gamma ok.",

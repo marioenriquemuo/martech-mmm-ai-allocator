@@ -126,6 +126,8 @@ Allocator trusts Meridian (or fixture) response curves — same Meridian≠Path-
 
 Stories sourced from local sprint backlog under `Secret/` (gitignored). Open gaps that may overlap: `GAP-201-RANK` (see `docs/learnings/open-gaps.md`).
 
+STORY-506 is not done. See [`docs/sprints/sprint-4.md`](docs/sprints/sprint-4.md).
+
 ## Key conventions
 
 - Prefer Miniconda env `mmt-mmm`; do not install project packages into conda `base`

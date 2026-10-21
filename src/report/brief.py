@@ -92,7 +92,7 @@ def render_offline(fact_pack: Mapping[str, Any]) -> CsuiteBrief:
         bullets.append(str(note))
 
     brief = CsuiteBrief(
-        headline=_headline(channels),
+        headline=_headline(channels, fact_pack.get("mode")),
         bullets=bullets,
         shifts=shifts,
         predicted_incremental_kpi=float(kpi),
@@ -133,6 +133,12 @@ def format_brief(brief: CsuiteBrief) -> str:
 
 # --- Sentence builders ---
 
+# Opening question. Same brief; only this line names the mode.
+_OPENING = {
+    "target": "Cheapest spend that reaches the KPI target",
+    "maximize": "How to split this fixed total budget",
+}
+
 
 def _fmt(value: float, *, signed: bool = False) -> str:
     """Fixed-point text within the prose lock's 1e-4 absolute tolerance.
@@ -150,7 +156,7 @@ def _fmt(value: float, *, signed: bool = False) -> str:
     return text
 
 
-def _headline(channels: Mapping[str, Mapping[str, Any]]) -> str:
+def _headline(channels: Mapping[str, Mapping[str, Any]], mode: str | None = None) -> str:
     channel, row = max(
         channels.items(),
         key=lambda item: abs(float(item[1]["spend_delta"])),
@@ -162,10 +168,14 @@ def _headline(channels: Mapping[str, Mapping[str, Any]]) -> str:
         direction = "unchanged"
     else:
         direction = "up"
-    return (
+    move = (
         f"Move {channel} {direction}: {_fmt(row['recommended_spend'])} "
         f"vs baseline {_fmt(row['baseline_spend'])}."
     )
+    question = _OPENING.get(str(mode) if mode is not None else "")
+    if question is None:
+        return move
+    return f"{question}. {move}"
 
 
 def _shift_bullet(channels: Mapping[str, Mapping[str, Any]]) -> str:
