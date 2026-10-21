@@ -13,9 +13,9 @@ Working brief for Claude/Cursor on **martech-mmm-ai-allocator** (Origin: `mario-
 | Core libs | numpy, pandas, scipy, scikit-learn, pymc, arviz, matplotlib, jupyter, plotly, pyyaml, pydantic, pandera, pyarrow, pytest, streamlit |
 | Secrets | `Secret/` gitignored — never read into commits or paste into PRs |
 | Docker | `Dockerfile` (micromamba + `environment.yml`) for the dashboard and allocator on port 8501. Full Meridian MCMC is a conda/CPU job. The first image build is heavy. |
-| Working branch | `sprint-3-exogenous-multitenant-mmt` (Sprint 3 — Exogenous Controls, Multi-Tenant Architecture & MMT Calibration); Sprint 2 archived on `sprint-2-mvp-optimization-agentic-ui` @ tag `sprint-2-mvp`; Sprint 1 on `main` + `sprint-1-core-data-engine` @ tag `sprint-1-milestone-1` |
+| Working branch | `sprint-4-orchestration-learning-deploy` (Sprint 4 — Real-Time Orchestration, Client-Isolated Continuous Learning & Production Deployment); brief [`docs/sprints/sprint-4.md`](docs/sprints/sprint-4.md). Sprint 3 merged on `main` (`docs/sprints/sprint-3.md`). Sprint 2 archived on `sprint-2-mvp-optimization-agentic-ui` @ tag `sprint-2-mvp`; Sprint 1 on `main` + `sprint-1-core-data-engine` @ tag `sprint-1-milestone-1` |
 | Remotes | `origin` (Origin `mario-mu-oz-dev/MMT-MMM`), `github` (`marioenriquemuo/martech-mmm-ai-allocator`, public) |
-| Status | Sprint 1–2 MVP on `main` / tag `sprint-2-mvp`; Sprint 3 active on `sprint-3-exogenous-multitenant-mmt` — brief `docs/sprints/sprint-3.md`; Meridian rank caveat still open — `docs/learnings/open-gaps.md` |
+| Status | Sprint 4 on `sprint-4-orchestration-learning-deploy` — brief `docs/sprints/sprint-4.md`; Sprint 3 merged on `main` (`docs/sprints/sprint-3.md`); Meridian rank caveat still open — `docs/learnings/open-gaps.md` |
 
 ## What we build
 

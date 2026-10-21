@@ -71,7 +71,7 @@ Not a trading lab. Do not import forex-research lab protocol, DSR gates, or Back
 
 ## Sprint status
 
-Working branch: **`sprint-3-exogenous-multitenant-mmt`** — Sprint 3 — Exogenous Controls, Multi-Tenant Architecture & MMT Calibration. Brief: `docs/sprints/sprint-3.md`.
+Working branch: **`sprint-4-orchestration-learning-deploy`** — Sprint 4 — Real-Time Orchestration, Client-Isolated Continuous Learning & Production Deployment. Brief: `docs/sprints/sprint-4.md`.
 
 **Sprint 3 goal:** Upgrade the data ingestion pipeline to handle organic traffic, holidays, quincenas, and inventory gaps, establish multi-tenant client isolation, and integrate MMT geo-experiment calibration anchors.
 
@@ -112,7 +112,7 @@ Cursor User Rules (Customize → Rules) also apply. Cloud agents do not load `~/
 | `origin` | `https://origin.cursor.com/mario-mu-oz-dev/MMT-MMM.git` |
 | `github` | `https://github.com/marioenriquemuo/martech-mmm-ai-allocator.git` |
 
-- Sprint integration work lands on `sprint-3-exogenous-multitenant-mmt`; push both remotes when asked
+- Sprint integration work lands on `sprint-4-orchestration-learning-deploy`; push both remotes when asked
 - Feature branches: `cursor/<short-topic>-…` when opening separate PRs
 - One concern per PR when practical (env, docs, model code)
 - Do not commit `Secret/`, `.conda/`, `*.egg-info/`, or notebook checkpoints

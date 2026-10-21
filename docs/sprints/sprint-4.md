@@ -1,6 +1,28 @@
-# Sprint 4
+# Sprint 4 — Real-Time Orchestration, Client-Isolated Continuous Learning & Production Deployment
 
-Follow-up to the Sprint 3 walkthrough. These stories are not done. Each one leaves `GAP-201-RANK` and `GAP-501-MODEL` open.
+| Item | Value |
+| --- | --- |
+| Working branch | `sprint-4-orchestration-learning-deploy` |
+| Goal | Implement automated webhook ingestion via n8n, establish client-isolated continuous Bayesian updating loops, and containerize the entire production engine with Docker and CI/CD pipelines. |
+| Builds on | `main` at `4ff7bbd2e14d50f4970ceddf92ab33b7a7b6ead0`. Sprint 3 is already merged (`docs/sprints/sprint-3.md`). |
+
+## Workstreams
+
+### 1. Real-time orchestration
+
+Automated webhook ingestion via n8n.
+
+### 2. Client-isolated continuous learning
+
+Bayesian updating loops that stay inside the existing client wall (`src/data/tenants.py`).
+
+### 3. Production deployment
+
+Docker and CI/CD for the production engine. A `Dockerfile` already runs the dashboard and allocator. Full Meridian MCMC is still a conda/CPU job.
+
+## Already on main
+
+STORY-504, STORY-505, STORY-506, and STORY-507 are already merged. They are not done. Their gaps stay open: `GAP-504-SMOKE`, `GAP-505-RHAT`, `GAP-506-MODE`, `GAP-201-RANK`, `GAP-501-MODEL`, `GAP-TARGET-BASELINE`, `GAP-QA-TIMEDELTA`. This sprint does not close them.
 
 ## STORY-504 — Smoke must not look like a new curve file
 
