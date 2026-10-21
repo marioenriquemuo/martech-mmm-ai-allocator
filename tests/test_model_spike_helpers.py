@@ -85,3 +85,59 @@ def test_recovery_rank_stats_directional_true(spike):
     stats = spike.recovery_rank_stats(iroas, contrib)
     assert stats["recovery_spearman"] == pytest.approx(1.0)
     assert stats["directional_recovery"] is True
+
+
+def test_rhat_fail_leaves_metrics_json_unchanged(spike, tmp_path, capsys):
+    """Failed full fit must not replace or create the current curve file."""
+    payload = {"story": "STORY-201", "dod": {"rhat_lt_1_05": False}}
+    existing = tmp_path / "metrics.json"
+    original = b'{"story":"current"}\n'
+    existing.write_bytes(original)
+
+    code = spike.publish_full_metrics(
+        existing,
+        payload,
+        rhat_pass=False,
+        max_rhat_core=1.2,
+        threshold=1.05,
+    )
+    assert code == 1
+    assert existing.read_bytes() == original
+
+    missing = tmp_path / "models" / "metrics.json"
+    missing.parent.mkdir()
+    code_missing = spike.publish_full_metrics(
+        missing,
+        payload,
+        rhat_pass=False,
+        max_rhat_core=1.08,
+        threshold=1.05,
+    )
+    assert code_missing == 1
+    assert not missing.exists()
+
+    captured = capsys.readouterr()
+    assert captured.out == ""
+    assert f"curve file not replaced: {existing}" in captured.err
+    assert f"curve file not replaced: {missing}" in captured.err
+    assert "FAIL: max core R-hat 1.2000 >= 1.05" in captured.err
+    assert "FAIL: max core R-hat 1.0800 >= 1.05" in captured.err
+
+
+def test_rhat_pass_writes_metrics_json(spike, tmp_path, capsys):
+    path = tmp_path / "metrics.json"
+    payload = {"story": "STORY-201", "dod": {"rhat_lt_1_05": True}}
+    code = spike.publish_full_metrics(
+        path,
+        payload,
+        rhat_pass=True,
+        max_rhat_core=1.01,
+        threshold=1.05,
+    )
+    assert code == 0
+    expected = spike.json.dumps(spike._jsonable(payload), indent=2) + "\n"
+    assert path.read_text() == expected
+    captured = capsys.readouterr()
+    assert f"wrote {path}" in captured.out
+    assert "full DoD: R-hat PASS" in captured.out
+    assert "curve file not replaced" not in captured.err

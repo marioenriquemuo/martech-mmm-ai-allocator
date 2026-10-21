@@ -19,6 +19,7 @@ Use [`open-gaps.md`](open-gaps.md) as the checklist. At tip `188e496` (pre-regis
 - [ ] `GAP-COMM-KPI` — standing communication caveat: incremental KPI ≠ revenue dollars
 - [ ] `GAP-501-API` — control inputs are CSV or frames; no live Search Console or CRM API
 - [ ] `GAP-501-MODEL` — exogenous controls are aligned and not passed into Meridian
+- [ ] `GAP-505-RHAT` — a failed full fit must not replace the current `metrics.json`
 
 Do not invent gaps here. Add a row only when README, CLAUDE/AGENTS, a learning doc, metrics, or a Bugbot review already evidences it.
 
