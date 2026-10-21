@@ -19,6 +19,10 @@ Use [`open-gaps.md`](open-gaps.md) as the checklist. At tip `188e496` (pre-regis
 - [ ] `GAP-COMM-KPI` — standing communication caveat: incremental KPI ≠ revenue dollars
 - [ ] `GAP-501-API` — control inputs are CSV or frames; no live Search Console or CRM API
 - [ ] `GAP-501-MODEL` — exogenous controls are aligned and not passed into Meridian
+- [ ] `GAP-TARGET-BASELINE` — target-mode "baseline" is an equal split of the cheapest total; shift lines still read like a change from old spend
+- [ ] `GAP-QA-TIMEDELTA` — `pd.Timedelta(days=WINDOW_DAYS)` in QA warns; NumPy's generic timedelta unit will error later
+
+STORY-507 ([`docs/sprints/sprint-4.md`](../sprints/sprint-4.md)) records `GAP-TARGET-BASELINE` and `GAP-QA-TIMEDELTA` and does not close `GAP-201-RANK` or `GAP-501-MODEL`.
 
 Do not invent gaps here. Add a row only when README, CLAUDE/AGENTS, a learning doc, metrics, or a Bugbot review already evidences it.
 

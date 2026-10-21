@@ -112,6 +112,32 @@ Index: [`README.md`](README.md).
 
 ---
 
+## GAP-TARGET-BASELINE
+
+| Field | Value |
+| --- | --- |
+| Story | None (walkthrough leftover; not STORY-504, 505, or 506) |
+| Status | `open` |
+| Severity | Low |
+| Description | In target mode the "baseline" is an equal split of the cheapest total (walkthrough: $509.21 / 4 = $127.30). Lift is correctly empty (`incremental_kpi_delta_vs_baseline` is None; `tests/test_allocator.py` locks that). The shift lines still read like a change from old spend. |
+| Evidence | `src/optimize/allocator.py` `_minimize_for_target` stores `constraints.total_budget` as null and passes `None` for `incremental_kpi_delta_vs_baseline`. `tests/test_allocator.py` `test_target_mode_hits_kpi_when_feasible` asserts that null. `src/report/facts.py` `build_fact_pack` uses `total_spend` when `constraints.total_budget` is null, then `_equal_room`. `src/report/brief.py` still prints "Budget shift" and "vs baseline". Walkthrough figure: $509.21 / 4 = $127.3025, which is $127.30 to the cent. |
+| Done when | Target-mode shift copy no longer reads as a move away from a prior budget, or a later story accepts that comparison in writing, and this row is closed with that evidence. Leave the null lift as it is. |
+
+---
+
+## GAP-QA-TIMEDELTA
+
+| Field | Value |
+| --- | --- |
+| Story | None (walkthrough leftover; not STORY-504, 505, or 506) |
+| Status | `open` |
+| Severity | Low |
+| Description | `src/data/qa.py` `_prior_activity` calls `pd.Timedelta(days=WINDOW_DAYS)`. That call warns that NumPy's generic timedelta unit is deprecated and will error later. QA still passes. STORY-507 does not fix the warning. |
+| Evidence | `src/data/qa.py` line 101: `start = as_of - pd.Timedelta(days=WINDOW_DAYS)` with `WINDOW_DAYS = 14`. Walkthrough review: NumPy warns that the generic timedelta unit is deprecated and will raise later. QA still passed on that review. |
+| Done when | That call no longer emits the generic-unit warning, QA still passes, and this row is closed. Not in STORY-507. |
+
+---
+
 ## Closed / not listed
 
 - `GAP-402-RENAME` — closed 2026-10-14; GitHub is `marioenriquemuo/martech-mmm-ai-allocator` (public). Local `github` remote updated. Origin unchanged.
@@ -120,3 +146,4 @@ Index: [`README.md`](README.md).
 - Secret hygiene — Bugbot scanned clean; not an open gap.
 - STORY-501 left `GAP-201-RANK` open. New open items are `GAP-501-API` and `GAP-501-MODEL` only. Month-end quincena and the synthetic holiday list are decided.
 - STORY-503 prior tightening does not close `GAP-201-RANK`.
+- STORY-507 does not close `GAP-201-RANK` or `GAP-501-MODEL`, and `GAP-501-API` stays open.
