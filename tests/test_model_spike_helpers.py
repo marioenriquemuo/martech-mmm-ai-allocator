@@ -85,3 +85,86 @@ def test_recovery_rank_stats_directional_true(spike):
     stats = spike.recovery_rank_stats(iroas, contrib)
     assert stats["recovery_spearman"] == pytest.approx(1.0)
     assert stats["directional_recovery"] is True
+
+
+class _Mmm:
+    """Stand-in for Meridian. Records the posterior call; does not run MCMC."""
+
+    def __init__(self) -> None:
+        self.posterior_calls = 0
+
+    def sample_prior(self, *_args, **_kwargs) -> None:
+        return None
+
+    def sample_posterior(self, *_args, **_kwargs) -> None:
+        self.posterior_calls += 1
+
+
+class _Input:
+    def __init__(self) -> None:
+        self.media = type("Media", (), {})()
+        self.media.coords = {"media_channel": type("Coord", (), {"values": ["meta"]})()}
+        self.kpi = np.zeros((1, 4))
+
+
+def _arm_smoke(spike, monkeypatch, tmp_path: Path, *, rhat_pass: bool) -> tuple[Path, _Mmm]:
+    """Point smoke at tmp curves and stub Meridian so main() never samples."""
+    processed = tmp_path / "processed"
+    models = tmp_path / "models"
+    raw = tmp_path / "raw"
+    processed.mkdir()
+    models.mkdir()
+    raw.mkdir()
+    (processed / "clean_spend.parquet").write_bytes(b"unused")
+    client = {
+        "client_id": "pathc",
+        "roots": {"processed": processed, "models": models, "raw": raw},
+    }
+    mmm = _Mmm()
+    monkeypatch.setattr(spike, "load_client", lambda *_args, **_kwargs: client)
+    monkeypatch.setattr(spike, "load_meridian_input", lambda *_args, **_kwargs: _Input())
+    monkeypatch.setattr(spike, "_build_mmm", lambda *_args, **_kwargs: mmm)
+    monkeypatch.setattr(
+        spike,
+        "_rhat_peek",
+        lambda *_args, **_kwargs: {
+            "rhat_pass": rhat_pass,
+            "max_rhat_core": 1.01 if rhat_pass else 2.39,
+        },
+    )
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        ["02_model_spike.py", "--mode", "smoke", "--client_id", "pathc"],
+    )
+    return models / "metrics.json", mmm
+
+
+def test_smoke_does_not_overwrite_metrics(spike, tmp_path, monkeypatch, capsys):
+    metrics, mmm = _arm_smoke(spike, monkeypatch, tmp_path, rhat_pass=False)
+    original = '{"keep": true}\n'
+    metrics.write_text(original, encoding="utf-8")
+
+    assert spike.main() == 0
+
+    assert metrics.read_text(encoding="utf-8") == original
+    assert mmm.posterior_calls == 1
+    out = capsys.readouterr().out
+    expected = spike.smoke_curves_notice(metrics.resolve())
+    assert expected == f"existing metrics: {metrics.resolve()}\ncurves were not replaced"
+    assert expected in out
+    assert "no curve file yet" not in out
+
+
+def test_smoke_says_when_curve_file_is_missing(spike, tmp_path, monkeypatch, capsys):
+    metrics, mmm = _arm_smoke(spike, monkeypatch, tmp_path, rhat_pass=True)
+
+    assert spike.main() == 0
+
+    assert not metrics.exists()
+    assert mmm.posterior_calls == 1
+    out = capsys.readouterr().out
+    expected = spike.smoke_curves_notice(metrics.resolve())
+    assert expected == f"no curve file yet: {metrics.resolve()}\ncurves were not replaced"
+    assert expected in out
+    assert "existing metrics:" not in out

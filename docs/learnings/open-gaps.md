@@ -112,6 +112,19 @@ Index: [`README.md`](README.md).
 
 ---
 
+## GAP-504-SMOKE
+
+| Field | Value |
+| --- | --- |
+| Story | STORY-504 |
+| Status | `open` |
+| Severity | Medium (a smoke exit can be read as a fresh curve file) |
+| Description | `--mode smoke` prints R-hat and returns before `metrics.json` is written. The allocator and the dashboard still read that curve file, so a smoke run that exits 0 can be mistaken for a new fit. |
+| Evidence | `scripts/02_model_spike.py` returns at the end of `--mode smoke` (after the R-hat peek, before the fuller-mode `metrics.json` write). `scripts/03_allocate_budget.py` and `app/streamlit_app.py` read `data/clients/pathc/models/metrics.json` (pathc models root). Reported walkthrough: smoke printed R-hat 2.39 and exited 0; allocate and the dashboard then used the curves already on disk. |
+| Done when | A smoke run prints the existing metrics path and that the curves were not replaced (or that there is no curve file yet), does not overwrite `metrics.json`, and a unit test locks both without a real MCMC sample. |
+
+---
+
 ## Closed / not listed
 
 - `GAP-402-RENAME` — closed 2026-10-14; GitHub is `marioenriquemuo/martech-mmm-ai-allocator` (public). Local `github` remote updated. Origin unchanged.
