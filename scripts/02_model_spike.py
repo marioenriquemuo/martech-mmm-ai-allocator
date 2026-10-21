@@ -13,8 +13,11 @@ Examples::
 Fuller mode writes metrics, the posterior predictive plot, and the
 parameter-recovery note under that client's ``models/``. Exits non-zero if max R-hat on core
 params ≥ 1.05. Smoke mode prints ``SMOKE_RHAT_WARN`` when R-hat is high but
-still exits 0 unless ``--fail-on-rhat``. Parameter-recovery Spearman is
-recorded in metrics / DoD flags only — never a hard fail for this spike.
+still exits 0 unless ``--fail-on-rhat``. Smoke does not write ``metrics.json``.
+It prints ``existing metrics: <path>`` when that file is already there, or
+``no curve file yet: <path>`` when it is not, then ``curves were not replaced``.
+Parameter-recovery Spearman is recorded in metrics / DoD flags only — never a
+hard fail for this spike.
 """
 
 from __future__ import annotations
@@ -102,7 +105,8 @@ def _parse_args() -> argparse.Namespace:
         "--mode",
         choices=("smoke", "full"),
         default="smoke",
-        help="smoke = short chains; full = DoD MCMC + artifacts",
+        help="smoke = short chains, does not replace metrics.json; "
+        "full = DoD MCMC + artifacts",
     )
     p.add_argument("--client_id", default="pathc")
     p.add_argument(
@@ -416,6 +420,20 @@ def _parameter_recovery(
     return "\n".join(lines), stats
 
 
+def smoke_curves_notice(metrics_path: Path) -> str:
+    """Smoke leaves ``metrics.json`` untouched. Name that file, or say it is absent.
+
+    The allocator and the dashboard keep reading this path, so a smoke exit
+    must not look like a new curve file.
+    """
+    path = Path(metrics_path)
+    if path.is_file():
+        head = f"existing metrics: {path}"
+    else:
+        head = f"no curve file yet: {path}"
+    return f"{head}\ncurves were not replaced"
+
+
 def main() -> int:
     args = _parse_args()
     client = load_client(args.client_id)
@@ -497,11 +515,13 @@ def main() -> int:
                 f"(smoke chains are short; use --mode full for DoD gate{extra})",
                 file=sys.stderr,
             )
-            if args.fail_on_rhat:
-                return 1
+            exit_code = 1 if args.fail_on_rhat else 0
         else:
             print("smoke OK — R-hat peek printed above")
-        return 0
+            exit_code = 0
+        # Last lines of a smoke run: the curve file on disk was not refreshed.
+        print(smoke_curves_notice(metrics_path))
+        return exit_code
 
     # --- Fuller DoD artifacts ---
     models.mkdir(parents=True, exist_ok=True)
